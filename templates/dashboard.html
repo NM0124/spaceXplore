@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SpaceXplore</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="container dashboard">
+    <div class="dashboard-header">
+        <div class="header-left">
+            <h2 class="dashboard-title">Campus Monitor</h2>
+            <p class="dashboard-subtitle">Real-time availability for classroom/lab across campus</p>
+            <form method="get" class="demo-clock top-left">
+                <label>Demo Time:</label>
+                <input type="time" name="time" value="{{ demo_time }}">
+                <button type="submit">Set</button>
+            </form>
+        </div>
+        <input type="text" id="searchInput" class="dashboard-search" placeholder="Search room or type...">
+        <a href="/" class="back-btn logout-style">← Back</a>
+    </div>
+
+    <div class="status-counters">
+        <div class="counter available">
+            <span class="dot available-dot"></span>
+            <span id="availableCount">0</span> Available
+        </div>
+        <div class="counter occupied">
+            <span class="dot occupied-dot"></span>
+            <span id="occupiedCount">0</span> Occupied
+        </div>
+    </div>
+
+    <div class="filters">
+        <div class="pill-group">
+            <button class="pill active" data-type="all">All Spaces</button>
+            <button class="pill" data-type="Classroom">Classrooms</button>
+            <button class="pill" data-type="Lab">Labs</button>
+        </div>
+        <div class="pill-group">
+            <button class="pill active" data-status="all">All</button>
+            <button class="pill" data-status="Available">Available</button>
+            <button class="pill" data-status="Occupied">Occupied</button>
+        </div>
+    </div>
+
+    <div class="room-grid" id="roomGrid">
+        {% if message %}
+            <div class="info-banner full-width">{{ message }}</div>
+        {% else %}
+            {% for room in rooms %}
+            <div class="room-card {{ room.status }}"
+                 data-room="{{ room.id | lower }} {{ room.type | lower }}"
+                 data-status="{{ room.status }}"
+                 data-type="{{ room.type }}">
+                <div class="room-header">
+                    <h3>{{ room.id }}</h3>
+                    <span class="status-dot {{ room.status }}"></span>
+                </div>
+                <p class="room-type">{{ room.type }}</p>
+                <p class="room-capacity">Capacity: {{ room.capacity }}</p>
+                <span class="status-label {{ room.status }}">{{ room.status }}</span>
+                {% if room.status == "Available" and room.density is defined %}
+                <div class="density-wrapper">
+                    <div class="density-label">Crowd Density: {{ room.density }}%</div>
+                    <div class="density-bar">
+                        <div class="density-fill {% if room.density < 40 %}green{% elif room.density < 70 %}yellow{% else %}red{% endif %}"
+                             style="width: {{ room.density }}%;"></div>
+                    </div>
+                </div>
+                {% endif %}
+                {% if room.status == "Occupied" and room.next_available %}
+                <p class="next-available">Next available at {{ room.next_available }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+</div>
+
+<script>
+const searchInput = document.getElementById("searchInput");
+const cards = document.querySelectorAll(".room-card");
+let activeType = "all";
+let activeStatus = "all";
+
+function filterRooms() {
+    const searchValue = searchInput.value.toLowerCase();
+    let availableCount = 0;
+    let occupiedCount = 0;
+
+    cards.forEach(card => {
+        const roomText = card.dataset.room;
+        const roomStatus = card.dataset.status;
+        const roomType = card.dataset.type;
+        const matchesSearch = roomText.includes(searchValue);
+        const matchesType = (activeType === "all" || roomType === activeType);
+        const matchesStatus = (activeStatus === "all" || roomStatus === activeStatus);
+        const visible = matchesSearch && matchesType && matchesStatus;
+        card.style.display = visible ? "block" : "none";
+
+        if (visible) {
+            if (roomStatus === "Available") availableCount++;
+            if (roomStatus === "Occupied") occupiedCount++;
+        }
+    });
+
+    document.getElementById("availableCount").textContent = availableCount;
+    document.getElementById("occupiedCount").textContent = occupiedCount;
+}
+
+searchInput.addEventListener("input", filterRooms);
+document.querySelectorAll("[data-type]").forEach(pill => {
+    pill.addEventListener("click", () => {
+        document.querySelectorAll("[data-type]").forEach(p => p.classList.remove("active"));
+        pill.classList.add("active");
+        activeType = pill.dataset.type;
+        filterRooms();
+    });
+});
+document.querySelectorAll("[data-status]").forEach(pill => {
+    pill.addEventListener("click", () => {
+        document.querySelectorAll("[data-status]").forEach(p => p.classList.remove("active"));
+        pill.classList.add("active");
+        activeStatus = pill.dataset.status;
+        filterRooms();
+    });
+});
+filterRooms();
+</script>
+</body>
+</html>

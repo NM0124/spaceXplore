@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SpaceXPlore</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="container dashboard">
+    <div class="dashboard-header">
+        <div>
+            <h2 class="admin-title">Admin Panel</h2>
+            <form method="get" class="demo-clock">
+                <label>Demo Time:</label>
+                <input type="time" name="time" value="{{ demo_time }}">
+                <button type="submit">Set</button>
+            </form>
+        </div>
+        <a href="/logout" class="logout-btn">Logout</a>
+    </div>
+
+    <div class="admin-form-glass">
+        <form method="post">
+            <label>Room</label>
+            <select name="room_id" required>
+                <option value="">Select room</option>
+                {% for r in rooms %}
+                <option value="{{ r.id }}">{{ r.id }}</option>
+                {% endfor %}
+            </select>
+            <label>Action</label>
+            <select name="action" required>
+                <option value="">Select</option>
+                <option value="occupied">Occupied till</option>
+                <option value="available">Available till</option>
+            </select>
+            <label>Till Time</label>
+            <input type="time" name="till_time" required>
+            <button type="submit">Update</button>
+        </form>
+    </div>
+
+    <div class="room-grid">
+        {% for room in rooms %}
+        <div class="room-card {{ room.status }}">
+            <div class="room-header">
+                <h3>{{ room.id }}</h3>
+                <span class="status-dot {{ room.status }}"></span>
+            </div>
+            <p class="room-type">{{ room.type }}</p>
+            <p class="room-capacity">Capacity: {{ room.capacity }}</p>
+            <span class="status-label {{ room.status }}">{{ room.status }}</span>
+            {% if room.status == "Occupied" and room.next_available %}
+            <p class="next-available">Next available at {{ room.next_available }}</p>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+</body>
+</html>
