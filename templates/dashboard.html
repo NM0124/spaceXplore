@@ -5,91 +5,143 @@
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body>
-<div class="container dashboard">
-    <div class="dashboard-header">
-        <div class="header-left">
-            <h2 class="dashboard-title">Campus Monitor</h2>
-            <p class="dashboard-subtitle">Real-time availability for classroom/lab across campus</p>
-            <form method="get" class="demo-clock top-left">
-                <label>Demo Time:</label>
-                <input type="time" name="time" value="{{ demo_time }}">
-                <button type="submit">Set</button>
-            </form>
+<body class="premium-dark">
+<div class="premium-container">
+    <header class="premium-header">
+        <div class="header-content">
+            <div class="brand">
+                <h1 class="brand-title">SpaceXplore</h1>
+                <p class="brand-tagline">Real-time Availability for Classrooms & Labs Across Campus</p>
+            </div>
+            <div class="header-actions">
+                <form method="get" class="time-selector">
+                    <div class="time-input-group">
+                        <span class="time-label">Demo Time</span>
+                        <input type="time" name="time" value="{{ demo_time }}" class="premium-time-input">
+                        <button type="submit" class="btn-gradient">Update</button>
+                    </div>
+                </form>
+                <a href="/" class="btn-outline">
+                    <svg class="icon" width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/>
+                    </svg>
+                    Exit
+                </a>
+            </div>
         </div>
-        <input type="text" id="searchInput" class="dashboard-search" placeholder="Search room or type...">
-        <a href="/" class="back-btn logout-style">← Back</a>
+    </header>
+    <div class="stats-grid-compact">
+        <div class="stat-card-compact stat-available">
+            <div class="stat-compact-left">
+                <svg width="24" height="24" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                <span class="stat-compact-label">Available Spaces</span>
+            </div>
+            <h2 class="stat-compact-value" id="availableCount">0</h2>
+        </div>
+        <div class="stat-card-compact stat-occupied">
+            <div class="stat-compact-left">
+                <svg width="24" height="24" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                </svg>
+                <span class="stat-compact-label">Occupied Spaces</span>
+            </div>
+            <h2 class="stat-compact-value" id="occupiedCount">0</h2>
+        </div>
+        <div class="search-card-compact">
+            <svg class="search-icon-compact" width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/>
+            </svg>
+            <input type="text" id="searchInput" class="search-input-compact" placeholder="Search rooms, labs, classrooms...">
+        </div>
     </div>
-
-    <div class="status-counters">
-        <div class="counter available">
-            <span class="dot available-dot"></span>
-            <span id="availableCount">0</span> Available
+    <div class="filter-section">
+        <div class="filter-group">
+            <p class="filter-title">Space Type</p>
+            <div class="filter-pills">
+                <button class="filter-pill active" data-type="all">All</button>
+                <button class="filter-pill" data-type="Classroom">Classrooms</button>
+                <button class="filter-pill" data-type="Lab">Labs</button>
+            </div>
         </div>
-        <div class="counter occupied">
-            <span class="dot occupied-dot"></span>
-            <span id="occupiedCount">0</span> Occupied
-        </div>
-    </div>
-
-    <div class="filters">
-        <div class="pill-group">
-            <button class="pill active" data-type="all">All Spaces</button>
-            <button class="pill" data-type="Classroom">Classrooms</button>
-            <button class="pill" data-type="Lab">Labs</button>
-        </div>
-        <div class="pill-group">
-            <button class="pill active" data-status="all">All</button>
-            <button class="pill" data-status="Available">Available</button>
-            <button class="pill" data-status="Occupied">Occupied</button>
+        <div class="filter-group">
+            <p class="filter-title">Availability</p>
+            <div class="filter-pills">
+                <button class="filter-pill active" data-status="all">All</button>
+                <button class="filter-pill" data-status="Available">Available</button>
+                <button class="filter-pill" data-status="Occupied">Occupied</button>
+            </div>
         </div>
     </div>
-
-    <div class="room-grid" id="roomGrid">
-        {% if message %}
-            <div class="info-banner full-width">{{ message }}</div>
-        {% else %}
+    {% if message %}
+        <div class="empty-state">
+            <svg width="64" height="64" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+            </svg>
+            <h3>{{ message }}</h3>
+        </div>
+    {% else %}
+        <div class="premium-grid" id="roomGrid">
             {% for room in rooms %}
-            <div class="room-card {{ room.status }}"
+            <div class="premium-room-card {{ room.status }}"
                  data-room="{{ room.id | lower }} {{ room.type | lower }}"
                  data-status="{{ room.status }}"
                  data-type="{{ room.type }}">
-                <div class="room-header">
-                    <h3>{{ room.id }}</h3>
-                    <span class="status-dot {{ room.status }}"></span>
-                </div>
-                <p class="room-type">{{ room.type }}</p>
-                <p class="room-capacity">Capacity: {{ room.capacity }}</p>
-                <span class="status-label {{ room.status }}">{{ room.status }}</span>
-                {% if room.status == "Available" and room.density is defined %}
-                <div class="density-wrapper">
-                    <div class="density-label">Crowd Density: {{ room.density }}%</div>
-                    <div class="density-bar">
-                        <div class="density-fill {% if room.density < 40 %}green{% elif room.density < 70 %}yellow{% else %}red{% endif %}"
-                             style="width: {{ room.density }}%;"></div>
+                <div class="card-header">
+                    <div class="room-info">
+                        <h3 class="room-name">{{ room.id }}</h3>
+                        <span class="room-badge">{{ room.type }}</span>
+                    </div>
+                    <div class="status-indicator {{ room.status }}">
+                        <span class="status-dot"></span>
                     </div>
                 </div>
-                {% endif %}
-                {% if room.status == "Occupied" and room.next_available %}
-                <p class="next-available">Next available at {{ room.next_available }}</p>
-                {% endif %}
+                <div class="card-body">
+                    <div class="capacity-info">
+                        <svg width="18" height="18" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
+                        </svg>
+                        <span>{{ room.capacity }} seats</span>
+                    </div>
+                    {% if room.status == "Available" and room.density is defined %}
+                    <div class="density-section">
+                        <div class="density-header">
+                            <span class="density-text">Occupancy</span>
+                            <span class="density-percent">{{ room.density }}%</span>
+                        </div>
+                        <div class="density-track">
+                            <div class="density-progress {% if room.density < 40 %}low{% elif room.density < 70 %}medium{% else %}high{% endif %}"
+                                 style="width: {{ room.density }}%"></div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if room.status == "Occupied" and room.next_available %}
+                    <div class="next-time">
+                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                        </svg>
+                        <span>Available at {{ room.next_available }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <span class="status-text">{{ room.status }}</span>
+                </div>
             </div>
             {% endfor %}
-        {% endif %}
-    </div>
+        </div>
+    {% endif %}
 </div>
-
 <script>
 const searchInput = document.getElementById("searchInput");
-const cards = document.querySelectorAll(".room-card");
+const cards = document.querySelectorAll(".premium-room-card");
 let activeType = "all";
 let activeStatus = "all";
-
 function filterRooms() {
     const searchValue = searchInput.value.toLowerCase();
     let availableCount = 0;
     let occupiedCount = 0;
-
     cards.forEach(card => {
         const roomText = card.dataset.room;
         const roomStatus = card.dataset.status;
@@ -99,17 +151,14 @@ function filterRooms() {
         const matchesStatus = (activeStatus === "all" || roomStatus === activeStatus);
         const visible = matchesSearch && matchesType && matchesStatus;
         card.style.display = visible ? "block" : "none";
-
         if (visible) {
             if (roomStatus === "Available") availableCount++;
             if (roomStatus === "Occupied") occupiedCount++;
         }
     });
-
     document.getElementById("availableCount").textContent = availableCount;
     document.getElementById("occupiedCount").textContent = occupiedCount;
 }
-
 searchInput.addEventListener("input", filterRooms);
 document.querySelectorAll("[data-type]").forEach(pill => {
     pill.addEventListener("click", () => {
