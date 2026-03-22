@@ -1,4 +1,4 @@
-# 🚀 spaceXplore
+# SpaceXplore
 
 A smart, real-time room and lab availability tracking system for educational institutions.
 
